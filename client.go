@@ -15,6 +15,7 @@ type ClientBase struct {
 
 type Client interface {
     LogIn(credentials Credentials) (code AuthorizationCode, err error)
+    Negotiate(code AuthorizationCode) (user User, err error)
 }
 
 func NewClient(appId string) Client {
@@ -32,8 +33,15 @@ func (client *ClientBase)perform(path string, form url.Values, resultObject inte
     req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
     req.Header.Add("X-BITHAVOC-REQUEST-TYPE", "API")
     resp, err = client.client.Do(req)
+    if err != nil {
+        return nil, err
+    }
     body := resp.Body
-    defer body.Close()
+    defer func() {
+        if body != nil {
+            body.Close()
+        }
+    }()
     resultData, err := ioutil.ReadAll(resp.Body)
     err = json.Unmarshal(resultData, &resultObject)
     if err != nil {

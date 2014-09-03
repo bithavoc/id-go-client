@@ -28,8 +28,8 @@ func (err IdError) Error() string {
     return err.FirstMessage
 }
 
-func (messages FlatErrorList) ToError() IdError {
-    err:= IdError {
+func (messages FlatErrorList) ToError() *IdError {
+    err:= &IdError {
         Messages: messages,
     }
     for fieldName, message := range messages {
