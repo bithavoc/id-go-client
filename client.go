@@ -7,7 +7,19 @@ import (
     "io/ioutil"
     "strings"
     "encoding/json"
+    "os"
 )
+
+const (
+    appId = "59abb3124156a6e47e39108e36f9f380"
+)
+
+func getBaseURL() string {
+    if os.Getenv("BH_ENV") != "" {
+        return "http://127.0.0.1:4000"
+    }
+    return "https://id.bithavoc.io"
+}
 
 type ClientBase struct {
     client *http.Client
@@ -26,7 +38,7 @@ func NewClient(appId string) Client {
 }
 
 func (client *ClientBase)perform(path string, form url.Values, resultObject interface{}) (resp *http.Response, err error) {
-    req, err := http.NewRequest("POST", fmt.Sprintf("%s/apps/%s/%s", baseURL, appId, path), strings.NewReader(form.Encode()))
+    req, err := http.NewRequest("POST", fmt.Sprintf("%s/apps/%s/%s", getBaseURL(), appId, path), strings.NewReader(form.Encode()))
     if err != nil {
         return nil, err
     }
