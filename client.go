@@ -27,6 +27,7 @@ type ClientBase struct {
 
 type Client interface {
     LogIn(credentials Credentials) (code AuthorizationCode, err error)
+    SignUp(info SignUp) (err error)
     Negotiate(code AuthorizationCode) (user User, err error)
 }
 
