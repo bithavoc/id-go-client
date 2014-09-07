@@ -29,6 +29,7 @@ type Client interface {
     LogIn(credentials Credentials) (code AuthorizationCode, err error)
     SignUp(info SignUp) (err error)
     Negotiate(code AuthorizationCode) (user User, err error)
+    Confirm(code string) (AuthorizationCode, error)
 }
 
 func NewClient(appId string) Client {
@@ -56,6 +57,7 @@ func (client *ClientBase)perform(path string, form url.Values, resultObject inte
         }
     }()
     resultData, err := ioutil.ReadAll(resp.Body)
+//    fmt.Println(string(resultData))
     err = json.Unmarshal(resultData, &resultObject)
     if err != nil {
         return nil, err
