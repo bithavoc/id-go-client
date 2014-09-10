@@ -36,15 +36,15 @@ type Client interface {
 }
 
 func NewClient(appId string) Client {
-	c := &ClientBase{
-		client: newLiveWebClient(),
-	}
-	prepareClient(c, appId)
-	return c
+	return newClient(appId, newLiveWebClient())
 }
 
-func prepareClient(client Client, appId string) {
-	client.SetAppId(appId)
+func newClient(appId string, wc webClient) Client {
+	c := &ClientBase{
+		client: wc,
+	}
+	c.SetAppId(appId)
+	return c
 }
 
 func (client *ClientBase) GetAppId() string {
