@@ -60,7 +60,7 @@ func (client *testWebClient) perform(appId string, path string, form url.Values,
 		outParam := reflect.ValueOf(resultObject).Elem()
 		mockedResult := reflect.ValueOf(mockedCall.resultObject).Elem()
 		outParam.Set(mockedResult)
-		return call.err
+		return mockedCall.err
 	} else {
 		panic(fmt.Errorf("Mocked call not found for %s %s", appId, path))
 	}
