@@ -31,6 +31,7 @@ type Client interface {
 	SignUp(info SignUp) (err error)
 	Negotiate(code AuthorizationCode) (user User, err error)
 	Confirm(code string) (AuthorizationCode, error)
+	Recover(email string) error
 	SetAppId(appId string)
 	GetAppId() string
 }
