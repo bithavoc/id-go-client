@@ -26,6 +26,10 @@ func (client *ClientBase) perform(path string, form url.Values, resultObject int
 	return client.client.perform(client.GetAppId(), path, form, resultObject)
 }
 
+func (client *ClientBase) retrieve(path string, resultObject interface{}) (err error) {
+	return client.client.retrieve(client.GetAppId(), path, resultObject)
+}
+
 type Client interface {
 	LogIn(credentials Credentials) (code AuthorizationCode, err error)
 	SignUp(info SignUp) (err error)
@@ -35,6 +39,7 @@ type Client interface {
 	Forgot(code, password string) error
 	SetAppId(appId string)
 	GetAppId() string
+	Validate(code string) (BasicUserInfo, error)
 }
 
 func NewClient(appId string) Client {
@@ -59,6 +64,7 @@ func (client *ClientBase) SetAppId(appId string) {
 
 type webClient interface {
 	perform(appId string, path string, form url.Values, resultObject interface{}) error
+	retrieve(appId string, path string, resultObject interface{}) error
 }
 
 type liveWebClient struct {
@@ -90,6 +96,30 @@ func (client *liveWebClient) perform(appId string, path string, form url.Values,
 	}()
 	resultData, err := ioutil.ReadAll(resp.Body)
 	//    fmt.Println(string(resultData))
+	err = json.Unmarshal(resultData, &resultObject)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (client *liveWebClient) retrieve(appId string, path string, resultObject interface{}) (err error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/apps/%s/%s", getBaseURL(), appId, path), nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("X-BITHAVOC-REQUEST-TYPE", "API")
+	resp, err := client.client.Do(req)
+	if err != nil {
+		return err
+	}
+	body := resp.Body
+	defer func() {
+		if body != nil {
+			body.Close()
+		}
+	}()
+	resultData, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(resultData, &resultObject)
 	if err != nil {
 		return err
